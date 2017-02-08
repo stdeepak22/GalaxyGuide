@@ -77,5 +77,10 @@ namespace GalaxyGuide.roman.num
         {            
             return _synonyms[num].Contains(syn.Trim());
         }                
+
+        public static bool CanBeSubtracted(this RomanNumber num)
+        {
+            return _subtrationList.Keys.Contains(num) && _subtrationList[num].Any();
+        }
     }    
 }

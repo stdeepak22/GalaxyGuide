@@ -12,10 +12,15 @@ namespace GalaxyGuide
     {
         static void Main(string[] args)
         {
-            RomanNumber.C.AddSynonym("new");
-            RomanNumber.C.GetSynonyms().ForEach(c => Console.WriteLine(c));
-            //Console.WriteLine();
-            Console.WriteLine(RomanNumber.C.Value());
+
+            //Console.WriteLine(100.GetBiggerRomanNumber());
+            //Console.WriteLine(100.GetSmallerRomanNumber());
+            Console.WriteLine(400.DoINeedToUseAnotherRoman());
+            Console.WriteLine("now");
+            RomanCompiler.GetDigits(100).ToList().ForEach(c =>
+            {
+                Console.WriteLine(c);
+            });
             Console.ReadLine();
         }
     }
