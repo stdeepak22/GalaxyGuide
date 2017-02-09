@@ -11,16 +11,23 @@ namespace GalaxyGuide
     class Program
     {
         static void Main(string[] args)
-        {
-
-            //Console.WriteLine(100.GetBiggerRomanNumber());
-            //Console.WriteLine(100.GetSmallerRomanNumber());
-            Console.WriteLine(400.DoINeedToUseAnotherRoman());
+        {            
             Console.WriteLine("now");
-            RomanCompiler.GetDigits(100).ToList().ForEach(c =>
-            {
-                Console.WriteLine(c);
-            });
+            Console.WriteLine(RomanCompiler.Compile(1902));
+            Console.WriteLine(RomanCompiler.Compile(200));
+            Console.WriteLine(RomanCompiler.Compile(300));
+            Console.WriteLine(RomanCompiler.Compile(400));
+            Console.WriteLine(RomanCompiler.Compile(500));
+            Console.WriteLine(RomanCompiler.Compile(600));
+            Console.WriteLine(RomanCompiler.Compile(700));
+            Console.WriteLine(RomanCompiler.Compile(800));
+            Console.WriteLine(RomanCompiler.Compile(900));
+            Console.WriteLine(RomanCompiler.Compile(1000));
+
+            //RomanCompiler.GetDigits(100).ToList().ForEach(c =>
+            //{
+            //    Console.WriteLine(c);
+            //});
             Console.ReadLine();
         }
     }

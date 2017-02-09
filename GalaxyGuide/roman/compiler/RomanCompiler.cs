@@ -3,13 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace GalaxyGuide.roman.compiler
 {
     public static class RomanCompiler
-    {
-        public static void Compile(int value)
+    {        
+        public static string Compile(int value)
         {
             List<List<RomanNumber>> result = new List<List<RomanNumber>>();         
             var list = GetDigits(value);
@@ -17,6 +18,8 @@ namespace GalaxyGuide.roman.compiler
             {
                 result.Add(GetRomanNumber(oneNum));
             }
+
+            return string.Join("", result.SelectMany(c => c).Select(c => c.ToString()));
         }
 
         private static List<RomanNumber> GetRomanNumber(int oneNum)
@@ -27,6 +30,7 @@ namespace GalaxyGuide.roman.compiler
             if (isAnother)
             {
                 var an = oneNum.GetAnotherRomanNumberToBeUser(ref b);
+                FormTheList(b, an, oneNum, result);
             }
             else
             {
@@ -38,8 +42,26 @@ namespace GalaxyGuide.roman.compiler
             return result;
 
         }
-
-        public static List<int> GetDigits(int value)
+        private static void FormTheList(RomanNumber b, RomanNumber an, int num, IList<RomanNumber> result)
+        {
+            result.Add(an);
+            
+            int sum = an.Value();
+            while(sum != num)
+            {
+                if(sum < num)
+                {
+                    result.Add(b);
+                    sum += b.Value();
+                }
+                else
+                {
+                    result.Insert(0, b);
+                    sum -= b.Value();
+                }
+            }
+        }
+        private static List<int> GetDigits(int value)
         {
             var asString = value.ToString();
             int length = asString.Length;
@@ -52,32 +74,40 @@ namespace GalaxyGuide.roman.compiler
                 index++;
             }
             return result.Where(c=>c > 0).ToList();
-        }
-
-        public static bool DoINeedToUseAnotherRoman(this int num)
+        }        
+        private static bool DoINeedToUseAnotherRoman(this int num)
         {
             return num.DoINeedToUseAnotherRoman(num.GetBaseForValue());
         }
-
-        public static bool DoINeedToUseAnotherRoman(this int num, RomanNumber baseNum)
+        private static bool DoINeedToUseAnotherRoman(this int num, RomanNumber baseNum)
         {
-            return num > ((int)baseNum * baseNum.Frequencey());
+            return num > baseNum.MaxValue();
         }
-        public static RomanNumber GetAnotherRomanNumberToBeUser(this int num, ref RomanNumber baseNum)
+        private static RomanNumber GetAnotherRomanNumberToBeUser(this int num, ref RomanNumber baseNum)
         {
+            RomanNumber result;
             var sbtrct = baseNum.CanBeSubtracted();
-            if(sbtrct)
+            if(!sbtrct)
             {
                 var l = baseNum.GetLeftRoman();
-                // will be working here.
-                return l;
+                if (num <= l.MaxValue() + baseNum.MaxValue())
+                {
+                    result = baseNum;
+                    baseNum = l;
+                }
+                else
+                {
+                    result = baseNum.GetRightRoman();
+                    baseNum = l;
+                }                
             }
             else
             {
-                return baseNum.GetRightRoman();
-            }            
+                result = baseNum.GetRightRoman();
+            }
+            return result;
         }
-        public static RomanNumber GetBaseForValue(this int num)
+        private static RomanNumber GetBaseForValue(this int num)
         {
             var result = Enum.GetValues(typeof(RomanNumber))
                 .Cast<int>()
@@ -85,7 +115,7 @@ namespace GalaxyGuide.roman.compiler
                 .First(c => c <= num);
             return (RomanNumber)result;
         }
-        public static RomanNumber GetLeftRoman(this RomanNumber num)
+        private static RomanNumber GetLeftRoman(this RomanNumber num)
         {
             var result = Enum.GetValues(typeof(RomanNumber))
                 .Cast<int>()
@@ -93,7 +123,7 @@ namespace GalaxyGuide.roman.compiler
                 .First(c => c < (int)num);
             return (RomanNumber)result;
         }
-        public static RomanNumber GetRightRoman(this RomanNumber num)
+        private static RomanNumber GetRightRoman(this RomanNumber num)
         {
             var result = Enum.GetValues(typeof(RomanNumber))
                 .Cast<int>()
@@ -101,5 +131,10 @@ namespace GalaxyGuide.roman.compiler
                 .First(c => c > (int)num);
             return (RomanNumber)result;
         }
+    }
+
+    static class ExtToCollection
+    {
+        
     }
 }
