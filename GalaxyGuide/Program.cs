@@ -13,17 +13,9 @@ namespace GalaxyGuide
         static void Main(string[] args)
         {            
             Console.WriteLine("now");
-            Console.WriteLine(RomanCompiler.Compile(1902));
-            Console.WriteLine(RomanCompiler.Compile(200));
-            Console.WriteLine(RomanCompiler.Compile(300));
-            Console.WriteLine(RomanCompiler.Compile(400));
-            Console.WriteLine(RomanCompiler.Compile(500));
-            Console.WriteLine(RomanCompiler.Compile(600));
-            Console.WriteLine(RomanCompiler.Compile(700));
-            Console.WriteLine(RomanCompiler.Compile(800));
-            Console.WriteLine(RomanCompiler.Compile(900));
-            Console.WriteLine(RomanCompiler.Compile(1000));
+            Console.WriteLine(RomanCompiler.Decompile("DEEPAK"));
 
+            Console.WriteLine(RomanCompiler.Decompile("CCCXCIX"));
             //RomanCompiler.GetDigits(100).ToList().ForEach(c =>
             //{
             //    Console.WriteLine(c);

@@ -83,9 +83,19 @@ namespace GalaxyGuide.roman.num
             return _subtrationList.Keys.Contains(num) && _subtrationList[num].Any();
         }
 
+        public static bool CanBeSubtractedFrom(this RomanNumber num, RomanNumber fromNum)
+        {
+            return _subtrationList.Keys.Contains(num) && _subtrationList[num].Contains(fromNum);
+        }
+
         public static int MaxValue(this RomanNumber num)
         {
             return _frequency[num] * num.Value();
+        }
+        
+        public static RomanNumber GetRomanFromSyn(this string syn)
+        {
+            return _synonyms.Where(c => c.Value.Contains(syn)).First().Key;
         }
     }    
 }

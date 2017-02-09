@@ -131,10 +131,58 @@ namespace GalaxyGuide.roman.compiler
                 .First(c => c > (int)num);
             return (RomanNumber)result;
         }
-    }
 
-    static class ExtToCollection
-    {
-        
-    }
+        public static int Decompile(string romanString)
+        {
+            var result = -1;
+            var copyToValidate = new Queue<string>(romanString.ToUpper().ToCharArray().Select(c => c.ToString()));
+            if (ValidRomanString(copyToValidate))
+            {
+                var romanQ = new Queue<RomanNumber>(romanString.ToUpper().ToCharArray().Select(c => c.ToString().GetRomanFromSyn()));
+                result = 0;
+                while(romanQ.Count > 0)
+                {
+                    var top = romanQ.Dequeue();
+                    if(romanQ.Count > 0)
+                    {
+                        var second = romanQ.Peek();
+                        if(top.Value() < second.Value())
+                        {
+                            //Dequeue one more item -- used for negative value.
+                            romanQ.Dequeue();
+                            result += (second.Value() - top.Value());
+                            continue;
+                        }                        
+                    }
+                    result += top.Value();
+                }
+            }
+            return result;
+        }
+
+        public static bool ValidRomanString(Queue<string> romanCharQ)
+        {            
+            var allRomans = Enum.GetNames(typeof(RomanNumber)).ToList();
+            // check if all are I, V, X, L, C, D, M
+            if (romanCharQ.Any(c=> allRomans.IndexOf(c.ToString()) < 0))
+            {
+                return false;
+            }
+            
+            while(romanCharQ.Count > 0)
+            {
+                var top = romanCharQ.Dequeue().GetRomanFromSyn();
+                if(romanCharQ.Count > 0)
+                {
+                    var second = romanCharQ.Peek().GetRomanFromSyn();
+                    if(top.Value() < second.Value()
+                        && !top.CanBeSubtractedFrom(second))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+    }    
 }
