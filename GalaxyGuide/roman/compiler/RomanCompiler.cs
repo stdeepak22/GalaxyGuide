@@ -21,7 +21,68 @@ namespace GalaxyGuide.roman.compiler
 
             return string.Join("", result.SelectMany(c => c).Select(c => c.ToString()));
         }
+        public static int Decompile(string romanString)
+        {
+            var result = -1;
+            if (ValidRomanStringRegex(romanString))
+            {
+                var romanQ = new Queue<RomanNumber>(romanString.ToUpper().ToCharArray().Select(c => c.ToString().GetRomanFromSyn()));
+                result = 0;
+                while (romanQ.Count > 0)
+                {
+                    var top = romanQ.Dequeue();
+                    if (romanQ.Count > 0)
+                    {
+                        var second = romanQ.Peek();
+                        if (top.Value() < second.Value())
+                        {
+                            //Dequeue one more item -- used for negative value.
+                            romanQ.Dequeue();
+                            result += (second.Value() - top.Value());
+                            continue;
+                        }
+                    }
+                    result += top.Value();
+                }
+            }
+            return result;
+        }
+        public static bool ValidRomanString_Old(string romanString)
+        {
+            var romanCharQ = new Queue<string>(romanString.ToUpper().ToCharArray().Select(c => c.ToString()));
 
+            var allRomans = Enum.GetNames(typeof(RomanNumber)).ToList();
+            // check if all are I, V, X, L, C, D, M
+            if (romanCharQ.Any(c => allRomans.IndexOf(c) < 0))
+            {
+                return false;
+            }
+
+            while (romanCharQ.Count > 0)
+            {
+                var top = romanCharQ.Dequeue().GetRomanFromSyn();
+                if (romanCharQ.Count > 0)
+                {
+                    var second = romanCharQ.Peek().GetRomanFromSyn();
+                    if (top.Value() < second.Value()
+                        && !top.CanBeSubtractedFrom(second))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        public static bool ValidRomanStringRegex(string romanString)
+        {
+            //copied from 
+            //http://stackoverflow.com/questions/267399/how-do-you-match-only-valid-roman-numerals-with-a-regular-expression#267405
+            var reg = @"^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$";
+            return Regex.IsMatch(romanString, reg);
+        }
+
+        #region Helper Methods
         private static List<RomanNumber> GetRomanNumber(int oneNum)
         {
             var result = new List<RomanNumber>();
@@ -34,10 +95,10 @@ namespace GalaxyGuide.roman.compiler
             }
             else
             {
-                for (int i = 0; i < oneNum/(int)b; i++)
+                for (int i = 0; i < oneNum / (int)b; i++)
                 {
                     result.Add(b);
-                }                
+                }
             }
             return result;
 
@@ -45,11 +106,11 @@ namespace GalaxyGuide.roman.compiler
         private static void FormTheList(RomanNumber b, RomanNumber an, int num, IList<RomanNumber> result)
         {
             result.Add(an);
-            
+
             int sum = an.Value();
-            while(sum != num)
+            while (sum != num)
             {
-                if(sum < num)
+                if (sum < num)
                 {
                     result.Add(b);
                     sum += b.Value();
@@ -67,14 +128,14 @@ namespace GalaxyGuide.roman.compiler
             int length = asString.Length;
             var result = new List<int>();
             int index = 0;
-            while(index < length)
+            while (index < length)
             {
                 var stringVal = asString.Substring(index, 1).PadRight(length - index, '0');
                 result.Add(int.Parse(stringVal));
                 index++;
             }
-            return result.Where(c=>c > 0).ToList();
-        }        
+            return result.Where(c => c > 0).ToList();
+        }
         private static bool DoINeedToUseAnotherRoman(this int num)
         {
             return num.DoINeedToUseAnotherRoman(num.GetBaseForValue());
@@ -87,7 +148,7 @@ namespace GalaxyGuide.roman.compiler
         {
             RomanNumber result;
             var sbtrct = baseNum.CanBeSubtracted();
-            if(!sbtrct)
+            if (!sbtrct)
             {
                 var l = baseNum.GetLeftRoman();
                 if (num <= l.MaxValue() + baseNum.MaxValue())
@@ -99,7 +160,7 @@ namespace GalaxyGuide.roman.compiler
                 {
                     result = baseNum.GetRightRoman();
                     baseNum = l;
-                }                
+                }
             }
             else
             {
@@ -111,7 +172,7 @@ namespace GalaxyGuide.roman.compiler
         {
             var result = Enum.GetValues(typeof(RomanNumber))
                 .Cast<int>()
-                .OrderByDescending(c=>c)
+                .OrderByDescending(c => c)
                 .First(c => c <= num);
             return (RomanNumber)result;
         }
@@ -130,59 +191,7 @@ namespace GalaxyGuide.roman.compiler
                 .OrderBy(c => c)
                 .First(c => c > (int)num);
             return (RomanNumber)result;
-        }
-
-        public static int Decompile(string romanString)
-        {
-            var result = -1;
-            var copyToValidate = new Queue<string>(romanString.ToUpper().ToCharArray().Select(c => c.ToString()));
-            if (ValidRomanString(copyToValidate))
-            {
-                var romanQ = new Queue<RomanNumber>(romanString.ToUpper().ToCharArray().Select(c => c.ToString().GetRomanFromSyn()));
-                result = 0;
-                while(romanQ.Count > 0)
-                {
-                    var top = romanQ.Dequeue();
-                    if(romanQ.Count > 0)
-                    {
-                        var second = romanQ.Peek();
-                        if(top.Value() < second.Value())
-                        {
-                            //Dequeue one more item -- used for negative value.
-                            romanQ.Dequeue();
-                            result += (second.Value() - top.Value());
-                            continue;
-                        }                        
-                    }
-                    result += top.Value();
-                }
-            }
-            return result;
-        }
-
-        public static bool ValidRomanString(Queue<string> romanCharQ)
-        {            
-            var allRomans = Enum.GetNames(typeof(RomanNumber)).ToList();
-            // check if all are I, V, X, L, C, D, M
-            if (romanCharQ.Any(c=> allRomans.IndexOf(c.ToString()) < 0))
-            {
-                return false;
-            }
-            
-            while(romanCharQ.Count > 0)
-            {
-                var top = romanCharQ.Dequeue().GetRomanFromSyn();
-                if(romanCharQ.Count > 0)
-                {
-                    var second = romanCharQ.Peek().GetRomanFromSyn();
-                    if(top.Value() < second.Value()
-                        && !top.CanBeSubtractedFrom(second))
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
+        }  
+        #endregion
     }    
 }

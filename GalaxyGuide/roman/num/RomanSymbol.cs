@@ -35,8 +35,7 @@ namespace GalaxyGuide.roman.num
             _subtrationList[RomanNumber.C] = new List<RomanNumber> { RomanNumber.D, RomanNumber.M};
             _subtrationList[RomanNumber.D] = new List<RomanNumber> { };
             _subtrationList[RomanNumber.M] = new List<RomanNumber> { /*because its highest roman symbol*/ };
-        }
-        
+        }        
 
         readonly static private Dictionary<RomanNumber, int> _frequency = new Dictionary<RomanNumber, int>();
         readonly static Dictionary<RomanNumber, List<string>> _synonyms = new Dictionary<RomanNumber, List<string>>();
@@ -62,9 +61,9 @@ namespace GalaxyGuide.roman.num
             {
                 _synonyms[num] = new List<string>();
             }
-            if (!_synonyms[num].Contains(syn.Trim()))
+            if (!_synonyms[num].Contains(syn.Trim().ToUpper()))
             {
-                _synonyms[num].Add(syn.Trim()); 
+                _synonyms[num].Add(syn.Trim().ToUpper()); 
             }
         }
 
@@ -75,7 +74,7 @@ namespace GalaxyGuide.roman.num
 
         public static bool IsSynonyms(this RomanNumber num, string syn)
         {            
-            return _synonyms[num].Contains(syn.Trim());
+            return _synonyms[num].Contains(syn.Trim().ToUpper());
         }
 
         public static bool CanBeSubtracted(this RomanNumber num)
@@ -95,7 +94,7 @@ namespace GalaxyGuide.roman.num
         
         public static RomanNumber GetRomanFromSyn(this string syn)
         {
-            return _synonyms.Where(c => c.Value.Contains(syn)).First().Key;
+            return _synonyms.Where(c => c.Value.Contains(syn.ToUpper())).First().Key;
         }
     }    
 }
